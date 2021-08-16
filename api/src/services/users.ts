@@ -128,6 +128,9 @@ export class UsersService extends ItemsService {
 		if (email) {
 			await this.checkUniqueEmails([email]);
 		}
+		if (typeof data.scope === 'undefined') {
+			data.scope = 'directus';
+		}
 
 		return await this.service.createOne(data, opts);
 	}
@@ -148,8 +151,14 @@ export class UsersService extends ItemsService {
 		if (passwords.length > 0) {
 			await this.checkPasswordPolicy(passwords);
 		}
+		const scopedData = data.map((payload: Record<string, any>) => {
+			if (typeof payload.scope === 'undefined') {
+				payload.scope = 'directus';
+			}
+			return payload;
+		}) as Partial<Item>[];
 
-		return await this.service.createMany(data, opts);
+		return await this.service.createMany(scopedData, opts);
 	}
 
 	async updateOne(key: PrimaryKey, data: Partial<Item>, opts?: MutationOptions): Promise<PrimaryKey> {
@@ -173,6 +182,10 @@ export class UsersService extends ItemsService {
 
 		if ('tfa_secret' in data) {
 			throw new InvalidPayloadException(`You can't change the "tfa_secret" value manually.`);
+		}
+
+		if (typeof data.scope === 'undefined') {
+			data.scope = 'directus';
 		}
 
 		return await this.service.updateOne(key, data, opts);
@@ -200,8 +213,14 @@ export class UsersService extends ItemsService {
 		if ('tfa_secret' in data) {
 			throw new InvalidPayloadException(`You can't change the "tfa_secret" value manually.`);
 		}
+		const scopedData = data.map((payload: Record<string, any>) => {
+			if (typeof payload.scope === 'undefined') {
+				payload.scope = 'directus';
+			}
+			return payload;
+		}) as Partial<Item>[];
 
-		return await this.service.updateMany(keys, data, opts);
+		return await this.service.updateMany(keys, scopedData, opts);
 	}
 
 	async updateByQuery(query: Query, data: Partial<Item>, opts?: MutationOptions): Promise<PrimaryKey[]> {
@@ -241,7 +260,9 @@ export class UsersService extends ItemsService {
 		if ('tfa_secret' in data) {
 			throw new InvalidPayloadException(`You can't change the "tfa_secret" value manually.`);
 		}
-
+		if (typeof data.scope === 'undefined') {
+			data.scope = 'directus';
+		}
 		return await this.service.updateByQuery(query, data, opts);
 	}
 

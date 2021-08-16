@@ -24,6 +24,7 @@
 				<div class="name type-title">{{ userName(data) }}</div>
 				<div class="status-role" :class="data.status">{{ t(data.status) }} {{ data.role.name }}</div>
 				<div class="email">{{ data.email }}</div>
+				<div class="email">{{ data.scope }}</div>
 			</div>
 		</div>
 	</v-menu>
@@ -41,6 +42,7 @@ type User = {
 	first_name: string;
 	last_name: string;
 	email: string;
+	scope: string;
 	avatar: {
 		id: string;
 	};
@@ -92,7 +94,7 @@ export default defineComponent({
 			try {
 				const response = await api.get(`/users/${props.user}`, {
 					params: {
-						fields: ['email', 'first_name', 'last_name', 'avatar.id', 'role.name', 'status', 'email'],
+						fields: ['email', 'first_name', 'last_name', 'avatar.id', 'role.name', 'status', 'email', 'scope'],
 					},
 				});
 				data.value = response.data.data;

@@ -35,7 +35,7 @@ const defaults: Record<string, any> = {
 	REFRESH_TOKEN_COOKIE_SECURE: false,
 	REFRESH_TOKEN_COOKIE_SAME_SITE: 'lax',
 	REFRESH_TOKEN_COOKIE_NAME: 'directus_refresh_token',
-
+	ADDITIONAL_SCOPES_ENABLED: false,
 	ROOT_REDIRECT: './admin',
 
 	CORS_ENABLED: true,

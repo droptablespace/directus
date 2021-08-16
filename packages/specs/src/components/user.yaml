@@ -75,6 +75,10 @@ properties:
     oneOf:
       - type: string
       - $ref: '../openapi.yaml#/components/schemas/Roles'
+  scope:
+    description: Scope of the user. Default is 'directus'
+    example: directus
+    type: string
   token:
     description: Static token for the user.
     type: string

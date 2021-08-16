@@ -3,7 +3,7 @@ export type Accountability = {
 	user?: string | null;
 	admin?: boolean;
 	app?: boolean;
-
+	scope?: string | null;
 	ip?: string;
 	userAgent?: string;
 };

@@ -52,6 +52,10 @@ columns:
     references:
       table: directus_roles
       column: id
+  scope:
+    type: string
+    nullable: true
+    length: 255
   token:
     type: string
     length: 255

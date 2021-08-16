@@ -66,7 +66,7 @@ export class AuthenticationService {
 		const { email, password, ip, userAgent, otp } = options;
 
 		let user = await this.knex
-			.select('id', 'password', 'role', 'tfa_secret', 'status')
+			.select('id', 'password', 'role', 'tfa_secret', 'status', 'scope')
 			.from('directus_users')
 			.whereRaw('LOWER(??) = ?', ['email', email.toLowerCase()])
 			.first();
@@ -79,6 +79,7 @@ export class AuthenticationService {
 			accountability: this.accountability,
 			status: 'pending',
 			user: user?.id,
+			scope: user?.scope,
 			database: this.knex,
 		});
 
@@ -95,6 +96,7 @@ export class AuthenticationService {
 				accountability: this.accountability,
 				status,
 				user: user?.id,
+				scope: user?.scope,
 				database: this.knex,
 			});
 		};
@@ -129,6 +131,11 @@ export class AuthenticationService {
 				await loginAttemptsLimiter.set(user.id, 0, 0);
 			}
 		}
+		if (user.scope !== 'directus') {
+			emitStatus('fail');
+			await stall(STALL_TIME, timeStart);
+			throw new InvalidCredentialsException();
+		}
 
 		if (password !== undefined) {
 			if (!user.password) {
@@ -162,6 +169,7 @@ export class AuthenticationService {
 
 		const payload = {
 			id: user.id,
+			scope: 'directus',
 		};
 
 		/**
@@ -221,21 +229,22 @@ export class AuthenticationService {
 		}
 
 		const record = await this.knex
-			.select<Session & { email: string; id: string }>(
+			.select<Session & { email: string; id: string; scope: string }>(
 				'directus_sessions.*',
 				'directus_users.email',
-				'directus_users.id'
+				'directus_users.id',
+				'directus_users.scope'
 			)
 			.from('directus_sessions')
 			.where({ 'directus_sessions.token': refreshToken })
 			.leftJoin('directus_users', 'directus_sessions.user', 'directus_users.id')
 			.first();
 
-		if (!record || !record.email || record.expires < new Date()) {
+		if (!record || !record.email || record.expires < new Date() || record.scope !== 'directus') {
 			throw new InvalidCredentialsException();
 		}
 
-		const accessToken = jwt.sign({ id: record.id }, env.SECRET as string, {
+		const accessToken = jwt.sign({ id: record.id, scope: 'directus' }, env.SECRET as string, {
 			expiresIn: env.ACCESS_TOKEN_TTL,
 		});
 

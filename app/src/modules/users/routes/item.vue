@@ -110,6 +110,7 @@
 						<v-skeleton-loader type="text" />
 						<v-skeleton-loader type="text" />
 						<v-skeleton-loader type="text" />
+						<v-skeleton-loader type="text" />
 					</template>
 					<template v-else-if="isNew === false && item">
 						<div class="name type-label">
@@ -119,6 +120,10 @@
 						<div class="email">
 							<v-icon name="alternate_email" small outline />
 							{{ item.email }}
+						</div>
+						<div class="email">
+							<v-icon name="gear" small outline />
+							{{ item.scope }}
 						</div>
 						<div v-if="item.location" class="location">
 							<v-icon name="place" small outline />
